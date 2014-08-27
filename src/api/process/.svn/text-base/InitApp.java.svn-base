@@ -1,0 +1,46 @@
+package MyProcess;
+
+import javax.servlet.*;
+
+import MyUtility.MyLogger;
+import Service.AnswerLog;
+import Service.ChargeLog;
+import Service.DefineMT;
+import Service.MOLog;
+import Sub.Subscriber;
+import Sub.UnSubscriber;
+
+public class InitApp implements ServletContextListener
+{
+	MyLogger mLog = new MyLogger(LocalConfig.LogConfigPath,this.getClass().toString());
+
+	public void contextInitialized(ServletContextEvent event)
+	{
+		try
+		{
+			ServletContext context = event.getServletContext();
+			LocalConfig.LogDataFolder = context.getInitParameter("LogDataFolder");
+			LocalConfig.VNPURLCharging = context.getInitParameter("VNPURLCharging");
+			LocalConfig.VNPCPName = context.getInitParameter("VNPCPName");
+			LocalConfig.VNPUserName = context.getInitParameter("VNPUserName");
+			LocalConfig.VNPPassword = context.getInitParameter("VNPPassword");
+
+			LocalConfig.GetListDefineMT();
+			
+			String Temp = context.getInitParameter("DELAY_SENT_MT");
+			if(!Temp.trim().equalsIgnoreCase(""))
+				LocalConfig.DELAY_SENT_MT = Integer.parseInt(Temp);
+		}
+		catch (Exception ex)
+		{
+			mLog.log.error(ex);
+		}
+	}
+
+	public void contextDestroyed(ServletContextEvent event)
+	{
+		ServletContext context = event.getServletContext();
+		context.log("***ShowLifecycles - Destroyed the servlet context");
+	}
+
+}
