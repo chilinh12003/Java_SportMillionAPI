@@ -170,7 +170,8 @@ public class Common
 		}
 	}
 
-	public static String GetDefineMT_Message(SubscriberObject mSubObj, MatchObject mMatchObj, DefineMT.MTType mMTType) throws Exception
+	public static String GetDefineMT_Message(SubscriberObject mSubObj, MatchObject mMatchObj, DefineMT.MTType mMTType)
+			throws Exception
 	{
 		try
 		{
@@ -182,6 +183,9 @@ public class Common
 				mMatchObj = GetTodayMatch();
 			}
 
+			String CurrentHour="";
+			String CurrentDate = "";
+			
 			String Match_ = "hom nay";
 			String PlayDate = "hom nay";
 			String PlayHour = "";
@@ -209,6 +213,7 @@ public class Common
 			String MOCount = "";
 			String Value = "";
 			String DayMark = "";
+			String WeekMark ="";
 			String DayCode = "";
 			String AnswerCount = "";
 
@@ -226,7 +231,9 @@ public class Common
 				BeginDate = mMatchObj.GetBeginDate();
 				EndHour = mMatchObj.GetEndHour();
 			}
-			if (mMTType == MTType.AnswerOver || mMTType == MTType.AnswerFinal || mMTType == MTType.ConsultMatch || mMTType == MTType.AnswerExpire)
+			
+			if (mMTType == MTType.AnswerOver || mMTType == MTType.AnswerFinal || mMTType == MTType.ConsultMatch
+					|| mMTType == MTType.AnswerExpire)
 			{
 				MatchObject mMatchObj1 = Common.GetNextMatch();
 				if (!mMatchObj1.IsNull() && mMatchObj1.StatusID == Match.Status.Next.GetValue())
@@ -256,24 +263,20 @@ public class Common
 				Integer TempCount = (LocalConfig.MaxAnswerByDay - mSubObj.MOByDay);
 				MOCount = TempCount.toString();
 
-				DayMark = mSubObj.ChargeMark.toString();
-				DayCode = mSubObj.CodeByDay.toString();
+				DayMark = Integer.toString(mSubObj.ChargeMark);
+				WeekMark = Integer.toString(mSubObj.WeekMark);
+				DayCode = Integer.toString(mSubObj.CodeByDay);
 
 				Integer TempAnserCount = 0;
 
-				if (mSubObj.AnswerBT != null && !mSubObj.AnswerBT.equalsIgnoreCase(""))
-					TempAnserCount++;
-				if (mSubObj.AnswerGB != null && !mSubObj.AnswerGB.equalsIgnoreCase(""))
-					TempAnserCount++;
+				if (mSubObj.AnswerBT != null && !mSubObj.AnswerBT.equalsIgnoreCase("")) TempAnserCount++;
+				if (mSubObj.AnswerGB != null && !mSubObj.AnswerGB.equalsIgnoreCase("")) TempAnserCount++;
 
-				if (mSubObj.AnswerKQ != null && !mSubObj.AnswerKQ.equalsIgnoreCase(""))
-					TempAnserCount++;
+				if (mSubObj.AnswerKQ != null && !mSubObj.AnswerKQ.equalsIgnoreCase("")) TempAnserCount++;
 
-				if (mSubObj.AnswerTS != null && !mSubObj.AnswerTS.equalsIgnoreCase(""))
-					TempAnserCount++;
+				if (mSubObj.AnswerTS != null && !mSubObj.AnswerTS.equalsIgnoreCase("")) TempAnserCount++;
 
-				if (mSubObj.AnswerTV != null && !mSubObj.AnswerTV.equalsIgnoreCase(""))
-					TempAnserCount++;
+				if (mSubObj.AnswerTV != null && !mSubObj.AnswerTV.equalsIgnoreCase("")) TempAnserCount++;
 
 				AnswerCount = TempAnserCount.toString();
 
@@ -287,8 +290,14 @@ public class Common
 					}
 				}
 			}
+			CurrentHour = MyConfig.Get_DateFormat_VNTimeShort().format(Calendar.getInstance().getTime());
+			CurrentDate = MyConfig.Get_DateFormat_VNShort().format(Calendar.getInstance().getTime());
 
+			MT = MT.replace("[CurrentDate]",CurrentDate);
+			MT = MT.replace("[CurrentHour]", CurrentHour);
+			
 			MT = MT.replace("[DayMark]", DayMark);
+			MT = MT.replace("[WeekMark]", WeekMark);
 			MT = MT.replace("[DayCode]", DayCode);
 			MT = MT.replace("[Match]", Match_);
 			MT = MT.replace("[PlayDate]", PlayDate);
@@ -337,7 +346,7 @@ public class Common
 			throw ex;
 		}
 	}
-
+	
 	public static MatchObject GetCurrentMatch(Date SendDate)
 	{
 		MatchObject mObject = new MatchObject();

@@ -568,7 +568,6 @@ public class ProRegister
 		return mMTType;
 	}
 
-
 	public MTType Process()
 	{
 		mMTType = MTType.RegFail;

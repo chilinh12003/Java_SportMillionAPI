@@ -87,7 +87,7 @@ public class ProGetInfoAllSub
 	String AppName = "";
 	String UserName = "";
 	String IP = "";
-	
+
 	public ProGetInfoAllSub(String MSISDN, String RequestID, String Channel, String AppName, String UserName, String IP)
 	{
 		this.MSISDN = MSISDN;
@@ -112,8 +112,8 @@ public class ProGetInfoAllSub
 			String last_time_renew = "NULL";
 			String last_time_retry = "NULL";
 			String expire_time = "NULL";
-			
-			if (mSubObj.IsNull())
+
+			if (mSubObj.IsNull() || (mSubObj.IsDereg && mSubObj.StatusID == Subscriber.Status.UndoSub.GetValue()))
 			{
 				mInfoSubResult = InfoSubResult.Success;
 				mStatus = Status.NotExist;
@@ -130,13 +130,13 @@ public class ProGetInfoAllSub
 
 				if (mSubObj.RenewChargeDate != null)
 					last_time_renew = MyConfig.Get_DateFormat_yyyymmddhhmmss().format(mSubObj.RenewChargeDate);
-				
+
 				if (mSubObj.RetryChargeDate != null)
 					last_time_retry = MyConfig.Get_DateFormat_yyyymmddhhmmss().format(mSubObj.RetryChargeDate);
 
 				if (mSubObj.ExpiryDate != null)
 					expire_time = MyConfig.Get_DateFormat_yyyymmddhhmmss().format(mSubObj.ExpiryDate);
-				
+
 				if (mSubObj.DeregDate != null)
 					last_time_unsubscribe = MyConfig.Get_DateFormat_yyyymmddhhmmss().format(mSubObj.DeregDate);
 			}
@@ -162,8 +162,10 @@ public class ProGetInfoAllSub
 					last_time_unsubscribe = MyConfig.Get_DateFormat_yyyymmddhhmmss().format(mSubObj.DeregDate);
 			}
 			String Format = "<SERVICE><error>%s</error><error_desc>%s</error_desc><packagename>%s</packagename><status>%s</status><last_time_subscribe>%s</last_time_subscribe><last_time_unsubscribe>%s</last_time_unsubscribe><last_time_renew>%s</last_time_renew><last_time_retry>%s</last_time_retry><expire_time>%s</expire_time></SERVICE>";
-			mBuilder.append(String.format(Format, new Object[] { mInfoSubResult.GetValue().toString(), mInfoSubResult.toString(),packagename,
-					mStatus.GetValue().toString(), last_time_subscribe, last_time_unsubscribe, last_time_renew, last_time_retry, expire_time }));
+			mBuilder.append(String.format(Format,
+					new Object[]{mInfoSubResult.GetValue().toString(), mInfoSubResult.toString(), packagename,
+							mStatus.GetValue().toString(), last_time_subscribe, last_time_unsubscribe, last_time_renew,
+							last_time_retry, expire_time}));
 		}
 		return mBuilder.toString();
 	}
@@ -189,18 +191,18 @@ public class ProGetInfoAllSub
 			mSub = new Subscriber(LocalConfig.mDBConfig_MSSQL);
 			mUnSub = new UnSubscriber(LocalConfig.mDBConfig_MSSQL);
 
-			Integer PID = MyConvert.GetPIDByMSISDN(MSISDN,LocalConfig.MAX_PID);
+			Integer PID = MyConvert.GetPIDByMSISDN(MSISDN, LocalConfig.MAX_PID);
 			// Lấy thông tin khách hàng đã đăng ký
 			MyTableModel mTable_Sub = mSub.Select(2, PID.toString(), MSISDN);
-			mList = SubscriberObject.ConvertToList(mTable_Sub,false);
+			mList = SubscriberObject.ConvertToList(mTable_Sub, false);
 
 			MyTableModel mTable_UnSub = mUnSub.Select(2, PID.toString(), MSISDN);
-			mListUnSub = SubscriberObject.ConvertToList(mTable_UnSub,true);
+			mListUnSub = SubscriberObject.ConvertToList(mTable_UnSub, true);
 			if (mList.size() > 0 && mListUnSub.size() > 0)
 			{
-				Collections.addAll( mListUnSub);
+				Collections.addAll(mListUnSub);
 			}
-			else if(mList.size() == 0 && mListUnSub.size() > 0)
+			else if (mList.size() == 0 && mListUnSub.size() > 0)
 			{
 				mList = mListUnSub;
 			}
@@ -210,8 +212,10 @@ public class ProGetInfoAllSub
 				mInfoSubResult = InfoSubResult.Success;
 				mStatus = Status.NotExist;
 				String Format = "<SERVICE><error>%s</error><error_desc>%s</error_desc><packagename>%s</packagename><status>%s</status><last_time_subscribe>%s</last_time_subscribe><last_time_unsubscribe>%s</last_time_unsubscribe><last_time_renew>%s</last_time_renew><last_time_retry>%s</last_time_retry><expire_time>%s</expire_time></SERVICE>";
-				ListService = String.format(Format, new Object[] { mInfoSubResult.GetValue().toString(), mInfoSubResult.toString(), packagename,
-						mStatus.GetValue().toString(), last_time_subscribe, last_time_unsubscribe, last_time_renew, last_time_retry, expire_time });
+				ListService = String.format(Format,
+						new Object[]{mInfoSubResult.GetValue().toString(), mInfoSubResult.toString(), packagename,
+								mStatus.GetValue().toString(), last_time_subscribe, last_time_unsubscribe,
+								last_time_renew, last_time_retry, expire_time});
 			}
 			else
 			{
@@ -224,8 +228,10 @@ public class ProGetInfoAllSub
 
 			mStatus = Status.NotSpecify;
 			String Format = "<SERVICE><error>%s</error><error_desc>%s</error_desc><packagename>%s</packagename><status>%s</status><last_time_subscribe>%s</last_time_subscribe><last_time_unsubscribe>%s</last_time_unsubscribe><last_time_renew>%s</last_time_renew><last_time_retry>%s</last_time_retry><expire_time>%s</expire_time></SERVICE>";
-			ListService = String.format(Format, new Object[] { mInfoSubResult.GetValue().toString(), mInfoSubResult.toString(), packagename,
-					mStatus.GetValue().toString(), last_time_subscribe, last_time_unsubscribe, last_time_renew, last_time_retry, expire_time });
+			ListService = String.format(Format,
+					new Object[]{mInfoSubResult.GetValue().toString(), mInfoSubResult.toString(), packagename,
+							mStatus.GetValue().toString(), last_time_subscribe, last_time_unsubscribe, last_time_renew,
+							last_time_retry, expire_time});
 
 			mLog.log.error(ex);
 		}

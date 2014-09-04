@@ -144,7 +144,7 @@ public class ProGetInfoSub
 			}
 
 			// Nếu chưa đăng ký dịch vụ
-			if (mSubObj.IsNull())
+			if (mSubObj.IsNull() || (mSubObj.IsDereg && mSubObj.StatusID == Subscriber.Status.UndoSub.GetValue()))
 			{
 				mInfoSubResult = InfoSubResult.Success;
 				mStatus = Status.NotExist;
@@ -174,6 +174,7 @@ public class ProGetInfoSub
 				
 				return GetResponse(last_time_subscribe, last_time_unsubscribe, last_time_renew, last_time_retry, expire_time);
 			}
+			
 			if (!mSubObj.IsNull() && mSubObj.IsDereg == true)
 			{
 				// Đã hủy dịch vụ
