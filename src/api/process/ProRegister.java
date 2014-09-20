@@ -1,6 +1,7 @@
 package api.process;
 
 import java.util.Calendar;
+import java.util.Vector;
 
 import uti.utility.MyConfig;
 import uti.utility.MyConfig.VNPApplication;
@@ -13,8 +14,11 @@ import api.process.PromotionObject.PromotionType;
 import api.process.PromotionObject.TrialType;
 import dat.service.DefineMT;
 import dat.service.DefineMT.MTType;
+import dat.service.News.NewsType;
 import dat.service.MOLog;
 import dat.service.MatchObject;
+import dat.service.NewsObject;
+import dat.service.WapRegLog;
 import dat.sub.Subscriber;
 import dat.sub.SubscriberObject;
 import dat.sub.UnSubscriber;
@@ -102,11 +106,11 @@ public class ProRegister
 	String Note = "";
 	String Bundle = "";
 
-	//Thời gian miễn phí để chèn vào MT trả về cho khách hàng
+	// Thời gian miễn phí để chèn vào MT trả về cho khách hàng
 	String FreeTime = "ngay dau tien";
 
-	public ProRegister(String MSISDN, String RequestID, String Code, String Promotion, String Trial, String Bundle, String Note, String Channel,
-			String AppName, String UserName, String IP)
+	public ProRegister(String MSISDN, String RequestID, String Code, String Promotion, String Trial, String Bundle,
+			String Note, String Channel, String AppName, String UserName, String IP)
 	{
 		this.MSISDN = MSISDN.trim();
 		this.RequestID = RequestID.trim();
@@ -189,7 +193,6 @@ public class ProRegister
 		}
 	}
 
-
 	/**
 	 * Thiết lập thông tin Promotion cho đối tượng sub
 	 * 
@@ -199,7 +202,8 @@ public class ProRegister
 	{
 		mCal_Expire = Calendar.getInstance();
 		mCal_Expire.set(Calendar.MILLISECOND, 0);
-		mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH), mCal_Current.get(Calendar.DATE), 23, 59, 59);
+		mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
+				mCal_Current.get(Calendar.DATE), 23, 59, 59);
 		if (mPromoObj.mAdvertiseType == AdvertiseType.Bundle)
 		{
 			if (mPromoObj.mBundleType == BundleType.NeverExpire)
@@ -212,7 +216,7 @@ public class ProRegister
 		{
 			if (mPromoObj.mTrialType == TrialType.Day)
 			{
-				mCal_Expire.add(Calendar.DATE, mPromoObj.TrialNumberFree);
+				mCal_Expire.add(Calendar.DATE, mPromoObj.TrialNumberFree - 1);
 				FreeTime = "" + mPromoObj.TrialNumberFree + " ngay";
 			}
 			else if (mPromoObj.mTrialType == TrialType.Week)
@@ -231,7 +235,7 @@ public class ProRegister
 		{
 			if (mPromoObj.mPromotionType == PromotionType.Day)
 			{
-				mCal_Expire.add(Calendar.DATE, mPromoObj.PromotionNumberFree);
+				mCal_Expire.add(Calendar.DATE, mPromoObj.PromotionNumberFree - 1);
 				FreeTime = "" + mPromoObj.PromotionNumberFree + " ngay";
 			}
 			else if (mPromoObj.mPromotionType == PromotionType.Week)
@@ -249,7 +253,7 @@ public class ProRegister
 
 		mSubObj.ExpiryDate = mCal_Expire.getTime();
 	}
-	
+
 	private void Init() throws Exception
 	{
 		try
@@ -261,7 +265,8 @@ public class ProRegister
 			mTableLog.Clear();
 
 			mCal_Expire.set(Calendar.MILLISECOND, 0);
-			mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH), mCal_Current.get(Calendar.DATE), 23, 59, 59);
+			mCal_Expire.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
+					mCal_Current.get(Calendar.DATE), 23, 59, 59);
 
 		}
 		catch (Exception ex)
@@ -332,19 +337,22 @@ public class ProRegister
 				mRow_Sub.SetValueCell("ChargeDate", MyConfig.Get_DateFormat_InsertDB().format(mSubObj.ChargeDate));
 
 			if (mSubObj.RenewChargeDate != null)
-				mRow_Sub.SetValueCell("RenewChargeDate", MyConfig.Get_DateFormat_InsertDB().format(mSubObj.RenewChargeDate));
-			
+				mRow_Sub.SetValueCell("RenewChargeDate",
+						MyConfig.Get_DateFormat_InsertDB().format(mSubObj.RenewChargeDate));
+
 			if (mSubObj.RetryChargeDate != null)
-				mRow_Sub.SetValueCell("RetryChargeDate", MyConfig.Get_DateFormat_InsertDB().format(mSubObj.RetryChargeDate));
-			
+				mRow_Sub.SetValueCell("RetryChargeDate",
+						MyConfig.Get_DateFormat_InsertDB().format(mSubObj.RetryChargeDate));
+
 			if (mSubObj.CofirmDeregDate != null)
-				mRow_Sub.SetValueCell("CofirmDeregDate", MyConfig.Get_DateFormat_InsertDB().format(mSubObj.CofirmDeregDate));
-			
+				mRow_Sub.SetValueCell("CofirmDeregDate",
+						MyConfig.Get_DateFormat_InsertDB().format(mSubObj.CofirmDeregDate));
+
 			if (mSubObj.DeregDate != null)
 			{
 				mRow_Sub.SetValueCell("DeregDate", MyConfig.Get_DateFormat_InsertDB().format(mSubObj.DeregDate));
 			}
-			
+
 			mRow_Sub.SetValueCell("ChannelTypeID", mSubObj.ChannelTypeID);
 			mRow_Sub.SetValueCell("StatusID", mSubObj.StatusID);
 			mRow_Sub.SetValueCell("PID", mSubObj.PID);
@@ -453,14 +461,15 @@ public class ProRegister
 			mSubObj.AnswerGB = "";
 			mSubObj.AnswerTS = "";
 			mSubObj.AnswerTV = "";
-			
+
 			mSubObj.CofirmDeregDate = null;
-			
+
 			mSubObj.IsNotify = true;
 			mSubObj.AppID = Common.GetApplication(AppName).GetValue();
 			mSubObj.AppName = Common.GetApplication(AppName).toString();
 			mSubObj.UserName = UserName;
 			mSubObj.IP = IP;
+			mSubObj.PartnerID = GetPartnerID();
 		}
 		catch (Exception ex)
 		{
@@ -508,6 +517,7 @@ public class ProRegister
 			mSubObj.AppName = Common.GetApplication(AppName).toString();
 			mSubObj.UserName = UserName;
 			mSubObj.IP = IP;
+			mSubObj.PartnerID = GetPartnerID();
 		}
 		catch (Exception ex)
 		{
@@ -515,49 +525,62 @@ public class ProRegister
 		}
 	}
 
+	private int GetPartnerID() throws Exception
+	{
+		if(Common.GetApplication(AppName) == VNPApplication.MOBILE_ADS ||
+				Common.GetApplication(AppName) == VNPApplication.MOBILEADS)
+		{
+			WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
+			MyTableModel mTable = mWapRegLog.Select(2, mSubObj.MSISDN);
+			if(mTable != null && mTable.GetRowCount() > 0)
+			{
+				return Integer.parseInt(mTable.GetValueAt(0, "PartnerID").toString());
+			}
+		}
+		return 0;
+	}
 	private MTType AddToList()
 	{
 		try
 		{
-			if(MSISDN.startsWith("8484"))
+			if (MSISDN.startsWith("8484"))
 				return mMTType;
-			
+
 			MTContent = Common.GetDefineMT_Message(mMTType, FreeTime);
 
-			
 			if (Common.SendMT(MSISDN, Keyword, MTContent, RequestID))
 				AddToMOLog(mMTType, MTContent);
 
-			if (mMTType == MTType.RegNewSuccess  || mMTType== MTType.RegCCOSSuccessFree)
+			if (mMTType == MTType.RegNewSuccess || mMTType == MTType.RegCCOSSuccessFree
+
+			|| mMTType == MTType.RegAgainSuccessFree || mMTType == MTType.RegAgainSuccessNotFree
+					|| mMTType == MTType.RegCCOSSuccessNotFree)
 			{
-				String MTContent_Current = Common.GetDefineMT_Message(mSubObj, mMatchObj, MTType.NotifyPromotion);
-				
-				Thread.sleep(LocalConfig.DELAY_SENT_MT);
-				if (Common.SendMT(MSISDN, Keyword, MTContent_Current, RequestID))
-					AddToMOLog(MTType.NotifyPromotion, MTContent_Current);
+				Vector<NewsObject> mListNews = Common.Get_List_Two_News();
 
-				Thread.sleep(LocalConfig.DELAY_SENT_MT);
-				MTContent_Current = Common.GetDefineMT_Message(mSubObj, mMatchObj, MTType.NotifyMark);
-				if (Common.SendMT(MSISDN, Keyword, MTContent_Current, RequestID))
-					AddToMOLog(MTType.NotifyMark, MTContent_Current);
+				String MTContent_Current_Push = "";
+				String MTContent_Current_Remider = "";
+				if (mListNews.size() > 0)
+				{
+					for (NewsObject mNewObj : mListNews)
+					{
+						if (mNewObj.mNewsType == NewsType.Push)
+							MTContent_Current_Push = mNewObj.Content;
 
-				Thread.sleep(LocalConfig.DELAY_SENT_MT);
-				MTContent_Current = Common.GetDefineMT_Message(mSubObj, mMatchObj, MTType.NotifyGuide);
-				if (Common.SendMT(MSISDN, Keyword, MTContent_Current, RequestID))
-					AddToMOLog(MTType.NotifyGuide, MTContent_Current);
-			}
-			else if (mMTType == MTType.RegAgainSuccessFree || mMTType == MTType.RegAgainSuccessNotFree 
-					 || mMTType== MTType.RegCCOSSuccessNotFree)
-			{
-				Thread.sleep(LocalConfig.DELAY_SENT_MT);
-				String MTContent_Current = Common.GetDefineMT_Message(mSubObj, mMatchObj, MTType.NotifyMark);
-				if (Common.SendMT(MSISDN, Keyword, MTContent_Current, RequestID))
-					AddToMOLog(MTType.NotifyMark, MTContent_Current);
+						if (mNewObj.mNewsType == NewsType.Reminder)
+							MTContent_Current_Remider = mNewObj.Content;
+					}
+				}
 
-				Thread.sleep(LocalConfig.DELAY_SENT_MT);
-				MTContent_Current = Common.GetDefineMT_Message(mSubObj, mMatchObj, MTType.NotifyGuide);
-				if (Common.SendMT(MSISDN, Keyword, MTContent_Current, RequestID))
-					AddToMOLog(MTType.NotifyGuide, MTContent_Current);
+				if (!MTContent_Current_Push.equalsIgnoreCase(""))
+				{
+					AddToMOLog(MTType.PushMT, MTContent_Current_Push);
+				}
+
+				if (!MTContent_Current_Remider.equalsIgnoreCase(""))
+				{
+					AddToMOLog(MTType.PushMTReminder, MTContent_Current_Remider);
+				}
 			}
 
 		}
@@ -600,14 +623,14 @@ public class ProRegister
 			// Lấy thông tin khách hàng đã đăng ký
 			MyTableModel mTable_Sub = mSub.Select(2, PID.toString(), MSISDN);
 
-			mSubObj = SubscriberObject.Convert(mTable_Sub,false);
+			mSubObj = SubscriberObject.Convert(mTable_Sub, false);
 
 			if (mSubObj.IsNull())
 			{
 				mTable_Sub = mUnSub.Select(2, PID.toString(), MSISDN);
 
 				if (mTable_Sub.GetRowCount() > 0)
-					mSubObj = SubscriberObject.Convert(mTable_Sub,true);
+					mSubObj = SubscriberObject.Convert(mTable_Sub, true);
 			}
 
 			mSubObj.PID = MyConvert.GetPIDByMSISDN(MSISDN, LocalConfig.MAX_PID);
@@ -638,14 +661,15 @@ public class ProRegister
 					CreateNewReg();
 					SetPromotionToSub();
 
-					ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+					ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel),
+							Common.GetApplication(AppName), UserName, IP);
 
 					if (mResult != ErrorCode.ChargeSuccess)
 					{
 						mMTType = MTType.RegFail;
 						return AddToList();
 					}
-					
+
 					if (Insert_Sub())
 					{
 						if (mSubObj.AppID == VNPApplication.CCOS.GetValue())
@@ -665,12 +689,13 @@ public class ProRegister
 
 					return AddToList();
 				}
-				else if(mSubObj.IsDereg && mSubObj.StatusID == dat.sub.Subscriber.Status.UndoSub.GetValue())
+				else if (mSubObj.IsDereg && mSubObj.StatusID == dat.sub.Subscriber.Status.UndoSub.GetValue())
 				{
 					CreateNewReg();
 					SetPromotionToSub();
 
-					ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+					ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel),
+							Common.GetApplication(AppName), UserName, IP);
 
 					if (mResult != ErrorCode.ChargeSuccess)
 					{
@@ -698,12 +723,13 @@ public class ProRegister
 				}
 				else
 				{
-					//đã từng sử dụng dịch vụ trước đây
+					// đã từng sử dụng dịch vụ trước đây
 					CreateRegAgain();
-					
+
 					SetPromotionToSub();
 
-					ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+					ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel),
+							Common.GetApplication(AppName), UserName, IP);
 
 					if (mResult != ErrorCode.ChargeSuccess)
 					{
@@ -737,7 +763,8 @@ public class ProRegister
 				// Tạo dữ liệu cho đăng ký mới
 				CreateNewReg();
 
-				ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+				ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel),
+						Common.GetApplication(AppName), UserName, IP);
 
 				if (mResult != ErrorCode.ChargeSuccess)
 				{
@@ -765,12 +792,14 @@ public class ProRegister
 				return AddToList();
 			}
 
-			//nếu số điện thoại đã từng đăng ký trước đây nhưng bị Vinaphone Hủy thuê bao
-			if(mSubObj.IsDereg && mSubObj.StatusID == dat.sub.Subscriber.Status.UndoSub.GetValue())
+			// nếu số điện thoại đã từng đăng ký trước đây nhưng bị Vinaphone
+			// Hủy thuê bao
+			if (mSubObj.IsDereg && mSubObj.StatusID == dat.sub.Subscriber.Status.UndoSub.GetValue())
 			{
 				CreateRegAgain();
 
-				ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+				ErrorCode mResult = Charge.ChargeRegFree(MSISDN, Keyword, Common.GetChannelType(Channel),
+						Common.GetApplication(AppName), UserName, IP);
 
 				if (mResult != ErrorCode.ChargeSuccess)
 				{
@@ -797,14 +826,15 @@ public class ProRegister
 
 				return AddToList();
 			}
-			
+
 			// Đã đăng ký trước đó nhưng đang hủy
 			if (mSubObj.IsDereg)
 			{
 				CreateRegAgain();
 
 				// đồng bộ thuê bao sang Vinpahone
-				ErrorCode mResult = Charge.ChargeReg(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+				ErrorCode mResult = Charge.ChargeReg(MSISDN, Keyword, Common.GetChannelType(Channel),
+						Common.GetApplication(AppName), UserName, IP);
 
 				// Charge
 				if (mResult == ErrorCode.BlanceTooLow)
@@ -831,7 +861,7 @@ public class ProRegister
 					{
 						mMTType = MTType.RegAgainSuccessNotFree;
 					}
-					
+
 					return AddToList();
 				}
 

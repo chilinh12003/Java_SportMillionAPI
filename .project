@@ -3,6 +3,9 @@
 	<name>TPTTAPI</name>
 	<comment></comment>
 	<projects>
+		<project>SportMillion</project>
+		<project>MyLibrary</project>
+		<project>MyDataProcess</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

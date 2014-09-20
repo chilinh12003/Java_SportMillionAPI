@@ -3,6 +3,7 @@ package api.process;
 import java.io.StringReader;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,6 +25,8 @@ import dat.service.DefineMT;
 import dat.service.DefineMT.MTType;
 import dat.service.Match;
 import dat.service.MatchObject;
+import dat.service.News;
+import dat.service.NewsObject;
 import dat.sub.Subscriber;
 import dat.sub.SubscriberObject;
 import db.define.MyTableModel;
@@ -558,5 +561,58 @@ public class Common
 			throw ex;
 		}
 
+	}
+
+
+	private static Vector<NewsObject> mList_Two_News = new Vector<NewsObject>();
+	
+	
+	/**
+	 * Lấy 2 tin tức mới nhất
+	 * @return
+	 * @throws Exception
+	 */
+	public static synchronized Vector<NewsObject> Get_List_Two_News() throws Exception
+	{
+		Calendar mCal_Current = Calendar.getInstance();
+		
+		if (mList_Two_News != null && mList_Two_News.size() > 0)
+		{
+			Calendar mCal_PushTime = Calendar.getInstance();
+
+			mCal_PushTime.setTime(mList_Two_News.get(0).PushTime);
+			if (mCal_PushTime.get(Calendar.YEAR) == mCal_Current.get(Calendar.YEAR)
+					&& mCal_PushTime.get(Calendar.MONTH) == mCal_Current.get(Calendar.MONTH)
+					&& mCal_PushTime.get(Calendar.DATE) == mCal_Current.get(Calendar.DATE)) return mList_Two_News;
+		}
+
+		if (mList_Two_News != null) mList_Two_News.clear();
+
+		News mNews = new News(LocalConfig.mDBConfig_MSSQL);
+
+		Calendar mCal_Begin = Calendar.getInstance();
+		Calendar mCal_End = Calendar.getInstance();
+
+		mCal_Begin.set(Calendar.MILLISECOND, 0);
+		mCal_End.set(Calendar.MILLISECOND, 0);
+		
+		mCal_Begin.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
+				mCal_Current.get(Calendar.DATE), 0, 0, 1);
+
+		MyTableModel mTable = mNews.Select(3, News.NewsType.Reminder.GetValue().toString(), MyConfig
+				.Get_DateFormat_InsertDB().format(mCal_Begin.getTime()),
+				MyConfig.Get_DateFormat_InsertDB().format(mCal_End.getTime()));
+
+		NewsObject mObject = NewsObject.Convert(mTable);
+		if (!mObject.IsNull()) mList_Two_News.add(mObject);
+
+		mTable = mNews.Select(3, News.NewsType.Push.GetValue().toString(),
+				MyConfig.Get_DateFormat_InsertDB().format(mCal_Begin.getTime()), MyConfig.Get_DateFormat_InsertDB()
+						.format(mCal_End.getTime()));
+
+		NewsObject mObject_2 = NewsObject.Convert(mTable);
+		if (!mObject.IsNull()) mList_Two_News.add(mObject_2);
+
+		return mList_Two_News;
 	}
 }

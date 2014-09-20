@@ -3,10 +3,10 @@
     <wb-module deploy-name="MTrafficAPI">
         <wb-resource deploy-path="/" source-path="/WebRoot" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <dependent-module archiveName="MyUtility.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyUtility/MyUtility">
+        <dependent-module archiveName="SportMillion.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/SportMillion/SportMillion">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="MyConnection.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyConnection/MyConnection">
+        <dependent-module archiveName="MyLibrary.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyLibrary/MyLibrary">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="MyDataProcess.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/MyDataProcess/MyDataProcess">
