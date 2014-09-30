@@ -527,26 +527,27 @@ public class ProRegister
 
 	private int GetPartnerID() throws Exception
 	{
-		if(Common.GetApplication(AppName) == VNPApplication.MOBILE_ADS ||
-				Common.GetApplication(AppName) == VNPApplication.MOBILEADS)
+		if (Common.GetApplication(AppName) == VNPApplication.MOBILE_ADS
+				|| Common.GetApplication(AppName) == VNPApplication.MOBILEADS)
 		{
 			WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
 			MyTableModel mTable = mWapRegLog.Select(2, mSubObj.MSISDN);
-			if(mTable != null && mTable.GetRowCount() > 0)
+			if (mTable != null && mTable.GetRowCount() > 0)
 			{
 				return Integer.parseInt(mTable.GetValueAt(0, "PartnerID").toString());
 			}
 		}
 		return 0;
 	}
+
 	private MTType AddToList()
 	{
 		try
 		{
 			if (MSISDN.startsWith("8484"))
 				return mMTType;
-
-			MTContent = Common.GetDefineMT_Message(mMTType, FreeTime);
+			MTContent = Common.GetDefineMT_Message(mSubObj, mMatchObj, mMTType);
+			MTContent = MTContent.replace("[FreeTime]", FreeTime);
 
 			if (Common.SendMT(MSISDN, Keyword, MTContent, RequestID))
 				AddToMOLog(mMTType, MTContent);
