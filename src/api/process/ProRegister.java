@@ -575,15 +575,16 @@ public class ProRegister
 
 				if (!MTContent_Current_Push.equalsIgnoreCase(""))
 				{
-					AddToMOLog(MTType.PushMT, MTContent_Current_Push);
+					if (Common.SendMT(MSISDN, Keyword, MTContent_Current_Push, RequestID))
+						AddToMOLog(MTType.PushMT, MTContent_Current_Push);
 				}
 
 				if (!MTContent_Current_Remider.equalsIgnoreCase(""))
 				{
-					AddToMOLog(MTType.PushMTReminder, MTContent_Current_Remider);
+					if (Common.SendMT(MSISDN, Keyword, MTContent_Current_Remider, RequestID))
+						AddToMOLog(MTType.PushMTReminder, MTContent_Current_Remider);
 				}
 			}
-
 		}
 		catch (Exception ex)
 		{
