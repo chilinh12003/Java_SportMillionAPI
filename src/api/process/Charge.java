@@ -22,7 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import uti.utility.MyConfig;
-import uti.utility.MyConfig.VNPApplication;
+import uti.utility.VNPApplication;
 import uti.utility.MyConvert;
 import uti.utility.MyLogger;
 import dat.service.ChargeLog;

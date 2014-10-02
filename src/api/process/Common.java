@@ -17,7 +17,7 @@ import org.xml.sax.InputSource;
 
 import uti.utility.MyCheck;
 import uti.utility.MyConfig;
-import uti.utility.MyConfig.VNPApplication;
+import uti.utility.VNPApplication;
 import uti.utility.MyLogger;
 import uti.utility.MyText;
 import dat.gateway.ems_send_queue;
@@ -60,7 +60,8 @@ public class Common
 			}
 			String REQUEST_ID = Temp.toString();
 
-			return mSendQueue.Insert(USER_ID, SERVICE_ID, COMMAND_CODE, MTContent, REQUEST_ID, LocalConfig.LONG_MESSAGE_CONTENT_TYPE.toString());
+			return mSendQueue.Insert(USER_ID, SERVICE_ID, COMMAND_CODE, MTContent, REQUEST_ID,
+					LocalConfig.LONG_MESSAGE_CONTENT_TYPE.toString());
 
 		}
 		catch (Exception ex)
@@ -127,8 +128,7 @@ public class Common
 			MyTableModel mTable = mSub.Select(2, Integer.toString(PID), MSISDN, Integer.toString(ServcieID));
 			if (mTable.GetRowCount() > 0)
 				return true;
-			else
-				return false;
+			else return false;
 		}
 		catch (Exception ex)
 		{
@@ -186,9 +186,9 @@ public class Common
 				mMatchObj = GetTodayMatch();
 			}
 
-			String CurrentHour="";
+			String CurrentHour = "";
 			String CurrentDate = "";
-			
+
 			String Match_ = "hom nay";
 			String PlayDate = "hom nay";
 			String PlayHour = "";
@@ -216,7 +216,7 @@ public class Common
 			String MOCount = "";
 			String Value = "";
 			String DayMark = "";
-			String WeekMark ="";
+			String WeekMark = "";
 			String DayCode = "";
 			String AnswerCount = "";
 
@@ -234,7 +234,7 @@ public class Common
 				BeginDate = mMatchObj.GetBeginDate();
 				EndHour = mMatchObj.GetEndHour();
 			}
-			
+
 			if (mMTType == MTType.AnswerOver || mMTType == MTType.AnswerFinal || mMTType == MTType.ConsultMatch
 					|| mMTType == MTType.AnswerExpire)
 			{
@@ -272,14 +272,19 @@ public class Common
 
 				Integer TempAnserCount = 0;
 
-				if (mSubObj.AnswerBT != null && !mSubObj.AnswerBT.equalsIgnoreCase("")) TempAnserCount++;
-				if (mSubObj.AnswerGB != null && !mSubObj.AnswerGB.equalsIgnoreCase("")) TempAnserCount++;
+				if (mSubObj.AnswerBT != null && !mSubObj.AnswerBT.equalsIgnoreCase(""))
+					TempAnserCount++;
+				if (mSubObj.AnswerGB != null && !mSubObj.AnswerGB.equalsIgnoreCase(""))
+					TempAnserCount++;
 
-				if (mSubObj.AnswerKQ != null && !mSubObj.AnswerKQ.equalsIgnoreCase("")) TempAnserCount++;
+				if (mSubObj.AnswerKQ != null && !mSubObj.AnswerKQ.equalsIgnoreCase(""))
+					TempAnserCount++;
 
-				if (mSubObj.AnswerTS != null && !mSubObj.AnswerTS.equalsIgnoreCase("")) TempAnserCount++;
+				if (mSubObj.AnswerTS != null && !mSubObj.AnswerTS.equalsIgnoreCase(""))
+					TempAnserCount++;
 
-				if (mSubObj.AnswerTV != null && !mSubObj.AnswerTV.equalsIgnoreCase("")) TempAnserCount++;
+				if (mSubObj.AnswerTV != null && !mSubObj.AnswerTV.equalsIgnoreCase(""))
+					TempAnserCount++;
 
 				AnswerCount = TempAnserCount.toString();
 
@@ -296,9 +301,9 @@ public class Common
 			CurrentHour = MyConfig.Get_DateFormat_VNTimeShort().format(Calendar.getInstance().getTime());
 			CurrentDate = MyConfig.Get_DateFormat_VNShort().format(Calendar.getInstance().getTime());
 
-			MT = MT.replace("[CurrentDate]",CurrentDate);
+			MT = MT.replace("[CurrentDate]", CurrentDate);
 			MT = MT.replace("[CurrentHour]", CurrentHour);
-			
+
 			MT = MT.replace("[DayMark]", DayMark);
 			MT = MT.replace("[WeekMark]", WeekMark);
 			MT = MT.replace("[DayCode]", DayCode);
@@ -350,7 +355,6 @@ public class Common
 		}
 	}
 
-	
 	public static MatchObject GetCurrentMatch(Date SendDate)
 	{
 		MatchObject mObject = new MatchObject();
@@ -513,16 +517,7 @@ public class Common
 	 */
 	public static VNPApplication GetApplication(String AppName)
 	{
-
-		try
-		{
-			return VNPApplication.valueOf(AppName.toUpperCase());
-		}
-		catch (Exception ex)
-		{
-			mLog.log.error(ex);
-		}
-		return VNPApplication.NoThing;
+		return VNPApplication.valueOf(AppName.toUpperCase());
 	}
 
 	/**
@@ -564,19 +559,18 @@ public class Common
 
 	}
 
-
 	private static Vector<NewsObject> mList_Two_News = new Vector<NewsObject>();
-	
-	
+
 	/**
 	 * Lấy 2 tin tức mới nhất
+	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	public static synchronized Vector<NewsObject> Get_List_Two_News() throws Exception
 	{
 		Calendar mCal_Current = Calendar.getInstance();
-		
+
 		if (mList_Two_News != null && mList_Two_News.size() > 0)
 		{
 			Calendar mCal_PushTime = Calendar.getInstance();
@@ -584,10 +578,12 @@ public class Common
 			mCal_PushTime.setTime(mList_Two_News.get(0).PushTime);
 			if (mCal_PushTime.get(Calendar.YEAR) == mCal_Current.get(Calendar.YEAR)
 					&& mCal_PushTime.get(Calendar.MONTH) == mCal_Current.get(Calendar.MONTH)
-					&& mCal_PushTime.get(Calendar.DATE) == mCal_Current.get(Calendar.DATE)) return mList_Two_News;
+					&& mCal_PushTime.get(Calendar.DATE) == mCal_Current.get(Calendar.DATE))
+				return mList_Two_News;
 		}
 
-		if (mList_Two_News != null) mList_Two_News.clear();
+		if (mList_Two_News != null)
+			mList_Two_News.clear();
 
 		News mNews = new News(LocalConfig.mDBConfig_MSSQL);
 
@@ -596,7 +592,7 @@ public class Common
 
 		mCal_Begin.set(Calendar.MILLISECOND, 0);
 		mCal_End.set(Calendar.MILLISECOND, 0);
-		
+
 		mCal_Begin.set(mCal_Current.get(Calendar.YEAR), mCal_Current.get(Calendar.MONTH),
 				mCal_Current.get(Calendar.DATE), 0, 0, 1);
 
@@ -605,14 +601,16 @@ public class Common
 				MyConfig.Get_DateFormat_InsertDB().format(mCal_End.getTime()));
 
 		NewsObject mObject = NewsObject.Convert(mTable);
-		if (!mObject.IsNull()) mList_Two_News.add(mObject);
+		if (!mObject.IsNull())
+			mList_Two_News.add(mObject);
 
 		mTable = mNews.Select(3, News.NewsType.Push.GetValue().toString(),
 				MyConfig.Get_DateFormat_InsertDB().format(mCal_Begin.getTime()), MyConfig.Get_DateFormat_InsertDB()
 						.format(mCal_End.getTime()));
 
 		NewsObject mObject_2 = NewsObject.Convert(mTable);
-		if (!mObject.IsNull()) mList_Two_News.add(mObject_2);
+		if (!mObject.IsNull())
+			mList_Two_News.add(mObject_2);
 
 		return mList_Two_News;
 	}

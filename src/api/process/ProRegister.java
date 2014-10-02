@@ -4,7 +4,7 @@ import java.util.Calendar;
 import java.util.Vector;
 
 import uti.utility.MyConfig;
-import uti.utility.MyConfig.VNPApplication;
+import uti.utility.VNPApplication;
 import uti.utility.MyConvert;
 import uti.utility.MyLogger;
 import api.process.Charge.ErrorCode;
@@ -90,6 +90,8 @@ public class ProRegister
 
 	String MTContent = "";
 	MyTableModel mTableLog = null;
+
+	MyTableModel mTable_WapRegLog = null;
 
 	String MSISDN = "";
 	String RequestID = "";
@@ -527,17 +529,41 @@ public class ProRegister
 
 	private int GetPartnerID() throws Exception
 	{
-		if (Common.GetApplication(AppName) == VNPApplication.MOBILE_ADS
-				|| Common.GetApplication(AppName) == VNPApplication.MOBILEADS)
+		if (Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILE_ADS
+				|| Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILEADS)
 		{
 			WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
-			MyTableModel mTable = mWapRegLog.Select(2, mSubObj.MSISDN);
-			if (mTable != null && mTable.GetRowCount() > 0)
+			mTable_WapRegLog = mWapRegLog.Select(2, mSubObj.MSISDN);
+			if (mTable_WapRegLog != null && mTable_WapRegLog.GetRowCount() > 0)
 			{
-				return Integer.parseInt(mTable.GetValueAt(0, "PartnerID").toString());
+				return Integer.parseInt(mTable_WapRegLog.GetValueAt(0, "PartnerID").toString());
 			}
 		}
 		return 0;
+	}
+
+	private void Update_WapRegLog()
+	{
+		try
+		{
+			if (Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILE_ADS
+					|| Common.GetApplication(AppName).mApp == VNPApplication.TelcoApplication.MOBILEADS)
+			{
+
+				if (mTable_WapRegLog == null || mTable_WapRegLog.GetRowCount() < 1)
+					return;
+				
+				mTable_WapRegLog.SetValueAt(MyConfig.Get_DateFormat_InsertDB().format(mCal_Current.getTime()), 0,
+						"RegisterDate");
+				mTable_WapRegLog.SetValueAt(WapRegLog.Status.Registered.GetValue(), 0, "StatusID");
+				WapRegLog mWapRegLog = new WapRegLog(LocalConfig.mDBConfig_MSSQL);
+				mWapRegLog.Update(1, mTable_WapRegLog.GetXML());
+			}
+		}
+		catch (Exception ex)
+		{
+			mLog.log.error(ex);
+		}
 	}
 
 	private MTType AddToList()
@@ -674,9 +700,8 @@ public class ProRegister
 
 					if (Insert_Sub())
 					{
-						if (mSubObj.AppID == VNPApplication.CCOS.GetValue())
+						if (mSubObj.AppID == VNPApplication.TelcoApplication.CCOS.GetValue())
 						{
-
 							mMTType = MTType.RegCCOSSuccessFree;
 						}
 						else
@@ -706,7 +731,7 @@ public class ProRegister
 					}
 					if (MoveToUnSub())
 					{
-						if (mSubObj.AppID == VNPApplication.CCOS.GetValue())
+						if (mSubObj.AppID == VNPApplication.TelcoApplication.CCOS.GetValue())
 						{
 
 							mMTType = MTType.RegCCOSSuccessFree;
@@ -740,7 +765,7 @@ public class ProRegister
 					}
 					if (MoveToUnSub())
 					{
-						if (mSubObj.AppID == VNPApplication.CCOS.GetValue())
+						if (mSubObj.AppID == VNPApplication.TelcoApplication.CCOS.GetValue())
 						{
 
 							mMTType = MTType.RegCCOSSuccessFree;
@@ -776,7 +801,7 @@ public class ProRegister
 
 				if (Insert_Sub())
 				{
-					if (mSubObj.AppID == VNPApplication.CCOS.GetValue())
+					if (mSubObj.AppID == VNPApplication.TelcoApplication.CCOS.GetValue())
 					{
 
 						mMTType = MTType.RegCCOSSuccessFree;
@@ -811,7 +836,7 @@ public class ProRegister
 
 				if (MoveToUnSub())
 				{
-					if (mSubObj.AppID == VNPApplication.CCOS.GetValue())
+					if (mSubObj.AppID == VNPApplication.TelcoApplication.CCOS.GetValue())
 					{
 
 						mMTType = MTType.RegCCOSSuccessFree;
@@ -854,7 +879,7 @@ public class ProRegister
 				// báo lỗi
 				if (MoveToUnSub())
 				{
-					if (mSubObj.AppID == VNPApplication.CCOS.GetValue())
+					if (mSubObj.AppID == VNPApplication.TelcoApplication.CCOS.GetValue())
 					{
 
 						mMTType = MTType.RegCCOSSuccessNotFree;
@@ -882,6 +907,7 @@ public class ProRegister
 		{
 			// Insert vao log
 			Insert_MOLog();
+			Update_WapRegLog();
 		}
 		return AddToList();
 	}
