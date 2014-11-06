@@ -224,7 +224,7 @@ public class ProDeregisterAll
 			for (SubscriberObject mSubObj : mListSub)
 			{
 				CreateDeReg(mSubObj);
-				ErrorCode mResult = Charge.ChargeDereg(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+				ErrorCode mResult = Charge.ChargeDereg(mSubObj.PartnerID,MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
 				if (mResult != ErrorCode.ChargeSuccess)
 				{
 					ListFail += "|ChargeDereg khong thanh cong ErrorCode:" + mResult.toString();

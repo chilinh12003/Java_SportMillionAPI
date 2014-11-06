@@ -117,11 +117,11 @@ public class Charge
 
 	static MyLogger mLog = new MyLogger(LocalConfig.LogConfigPath, Charge.class.toString());
 
-	public static ErrorCode ChargeRegFree(String MSISDN, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
+	public static ErrorCode ChargeRegFree(Integer PartnerID,String MSISDN, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
 	{
 		try
 		{
-			return ChargeVNP(MSISDN, 0, Reason.REG_DAILY, 5000, 1, Keyword, mChannel,mVNPApp,VNPUserName,IP);
+			return ChargeVNP(PartnerID,MSISDN, 0, Reason.REG_DAILY, 5000, 1, Keyword, mChannel,mVNPApp,VNPUserName,IP);
 		}
 		catch (Exception ex)
 		{
@@ -129,11 +129,11 @@ public class Charge
 		}
 	}
 
-	public static ErrorCode ChargeReg(String MSISDN, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
+	public static ErrorCode ChargeReg(Integer PartnerID,String MSISDN, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
 	{
 		try
 		{
-			return ChargeVNP(MSISDN, 5000, Reason.REG_DAILY, 5000, 0, Keyword, mChannel,mVNPApp,VNPUserName,IP);
+			return ChargeVNP(PartnerID,MSISDN, 5000, Reason.REG_DAILY, 5000, 0, Keyword, mChannel,mVNPApp,VNPUserName,IP);
 		}
 		catch (Exception ex)
 		{
@@ -141,11 +141,11 @@ public class Charge
 		}
 	}
 
-	public static ErrorCode ChargeRenew(String MSISDN,Integer Price, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
+	public static ErrorCode ChargeRenew(Integer PartnerID,String MSISDN,Integer Price, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
 	{
 		try
 		{
-			return ChargeVNP(MSISDN, Price, Reason.RENEW_DAILY, Price, 0, Keyword, mChannel,mVNPApp,VNPUserName,IP);
+			return ChargeVNP( PartnerID,MSISDN, Price, Reason.RENEW_DAILY, Price, 0, Keyword, mChannel,mVNPApp,VNPUserName,IP);
 		}
 		catch (Exception ex)
 		{
@@ -153,11 +153,11 @@ public class Charge
 		}
 	}
 
-	public static ErrorCode ChargeDereg( String MSISDN, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
+	public static ErrorCode ChargeDereg(Integer PartnerID, String MSISDN, String Keyword, MyConfig.ChannelType mChannel,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
 	{
 		try
 		{
-			return ChargeVNP( MSISDN, 0, Reason.UNREG_DAILY, 0, 0, Keyword, mChannel,mVNPApp,VNPUserName,IP);
+			return ChargeVNP(PartnerID, MSISDN, 0, Reason.UNREG_DAILY, 0, 0, Keyword, mChannel,mVNPApp,VNPUserName,IP);
 		}
 		catch (Exception ex)
 		{
@@ -197,7 +197,7 @@ public class Charge
 		return Result;
 	}
 
-	private static boolean InsertChargeLog( String MSISDN, Integer PRICE, Reason REASON, Integer ORIGINALPRICE, Integer PROMOTION,
+	private static boolean InsertChargeLog( Integer PartnerID,String MSISDN, Integer PRICE, Reason REASON, Integer ORIGINALPRICE, Integer PROMOTION,
 			MyConfig.ChannelType CHANNEL,VNPApplication mVNPApp, String VNPUserName, String IP, ErrorCode mResult)
 	{
 		try
@@ -235,7 +235,7 @@ public class Charge
 			
 			mRow_Log.SetValueCell("UserName", VNPUserName);
 			mRow_Log.SetValueCell("IP", IP);
-			mRow_Log.SetValueCell("PartnerID", 0);
+			mRow_Log.SetValueCell("PartnerID", PartnerID);
 			
 			mTableLog.AddNewRow(mRow_Log);
 
@@ -248,7 +248,7 @@ public class Charge
 		}
 	}
 
-	private static ErrorCode ChargeVNP(String MSISDN, Integer PRICE, Reason REASON, Integer ORIGINALPRICE, Integer PROMOTION,
+	private static ErrorCode ChargeVNP(Integer PartnerID,String MSISDN, Integer PRICE, Reason REASON, Integer ORIGINALPRICE, Integer PROMOTION,
 			String NOTE, MyConfig.ChannelType CHANNEL,VNPApplication mVNPApp, String VNPUserName, String IP) throws Exception
 	{
 		String XMLResponse = "";
@@ -294,7 +294,7 @@ public class Charge
 
 			mResult = GetErrorCode(XMLResponse);
 
-			if (!InsertChargeLog(MSISDN, PRICE, REASON, ORIGINALPRICE, PROMOTION, CHANNEL,mVNPApp,VNPUserName,IP, mResult))
+			if (!InsertChargeLog(PartnerID,MSISDN, PRICE, REASON, ORIGINALPRICE, PROMOTION, CHANNEL,mVNPApp,VNPUserName,IP, mResult))
 			{
 				SaveChargeLogStatus = "Save Chargelog Satus: FAIL";
 			}

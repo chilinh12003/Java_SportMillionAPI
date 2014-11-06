@@ -267,7 +267,6 @@ public class ProDeregister
 		{
 			mSubObj.ChannelTypeID = Common.GetChannelType(Channel).GetValue();
 			mSubObj.DeregDate = mCal_Current.getTime();
-			
 
 			mSubObj.AppID = Common.GetApplication(AppName).GetValue();
 			mSubObj.AppName = Common.GetApplication(AppName).toString();
@@ -305,7 +304,7 @@ public class ProDeregister
 			}
 
 			CreateDeReg();
-			ErrorCode mResult = Charge.ChargeDereg(MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
+			ErrorCode mResult = Charge.ChargeDereg(mSubObj.PartnerID,MSISDN, Keyword, Common.GetChannelType(Channel), Common.GetApplication(AppName), UserName, IP);
 			if (mResult != ErrorCode.ChargeSuccess)
 			{
 				mMTType = MTType.RegFail;
