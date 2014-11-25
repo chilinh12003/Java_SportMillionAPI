@@ -74,24 +74,45 @@ public class ProDeregister
 	String MSISDN = "";
 	String RequestID = "";
 	String Code = "";
+	String Note = "";
 	String Channel = "";
 	
-	String Keyword = "HUY";
+	String Keyword = "HUY API";
 	String AppName = "";
 	String UserName = "";
 	String IP = "";
 
-	public ProDeregister(String MSISDN, String RequestID, String Code, String Channel, String AppName, String UserName, String IP)
+	public ProDeregister(String MSISDN, String RequestID, String Code,String Note, String Channel, String AppName, String UserName, String IP)
 	{
 		this.MSISDN = MSISDN.trim();
 		this.RequestID = RequestID.trim();
 		this.Code = Code.trim();
+		this.Note = Note.trim();
 		this.Channel = Channel.toUpperCase().trim();
 		this.AppName = AppName.trim();
 		this.UserName = UserName.trim();
 		this.IP = IP.trim();
 	}
 
+	/**
+	 * Lấy thông tin MO từ VNP gửi sang
+	 */
+	private void GetMO()
+	{
+		try
+		{
+			String[] arr = Note.split("\\|");
+			if(arr.length >=2)
+			{
+				Keyword = arr[1];
+			}
+		}
+		catch(Exception ex)
+		{
+			mLog.log.error(ex);
+		}
+	}
+	
 	private void Init() throws Exception
 	{
 		try
@@ -116,6 +137,7 @@ public class ProDeregister
 				return mMTType;
 			
 			MTContent = Common.GetDefineMT_Message(mSubObj, mMatchObj, mMTType);
+			
 			if (Common.SendMT(MSISDN, Keyword, MTContent, RequestID))
 				AddToMOLog(mMTType, MTContent);
 		}
@@ -287,6 +309,8 @@ public class ProDeregister
 			// Khoi tao
 			Init();
 
+			GetMO();
+			
 			Integer PID = MyConvert.GetPIDByMSISDN(MSISDN, LocalConfig.MAX_PID);
 
 			MyTableModel mTable_Sub = mSub.Select(2, PID.toString(), MSISDN);

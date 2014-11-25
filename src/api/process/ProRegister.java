@@ -98,7 +98,7 @@ public class ProRegister
 	String Code = "";
 	String Channel = "";
 
-	String Keyword = "DK";
+	String Keyword = "DK API";
 	String AppName = "";
 	String UserName = "";
 	String IP = "";
@@ -259,6 +259,25 @@ public class ProRegister
 		mSubObj.ExpiryDate = mCal_Expire.getTime();
 	}
 
+	/**
+	 * Lấy thông tin MO từ VNP gửi sang
+	 */
+	private void GetMO()
+	{
+		try
+		{
+			String[] arr = Note.split("\\|");
+			if(arr.length >=2)
+			{
+				Keyword = arr[1];
+			}
+		}
+		catch(Exception ex)
+		{
+			mLog.log.error(ex);
+		}
+	}
+	
 	private void Init() throws Exception
 	{
 		try
@@ -293,7 +312,7 @@ public class ProRegister
 			mRow_Log.SetValueCell("ChannelTypeName", Common.GetChannelType(Channel).toString());
 			mRow_Log.SetValueCell("MTTypeID", mMTType_Current.GetValue());
 			mRow_Log.SetValueCell("MTTypeName", mMTType_Current.toString());
-			mRow_Log.SetValueCell("MO", Code);
+			mRow_Log.SetValueCell("MO", Keyword);
 			mRow_Log.SetValueCell("MT", MTContent_Current);
 			mRow_Log.SetValueCell("PID", MyConvert.GetPIDByMSISDN(MSISDN, LocalConfig.MAX_PID));
 			mRow_Log.SetValueCell("RequestID", RequestID);
@@ -685,6 +704,8 @@ public class ProRegister
 			// Khoi tao
 			Init();
 
+			GetMO();
+			
 			// Tính toàn khuyến mãi
 			CalculatePromotion();
 
